@@ -1,0 +1,63 @@
+function Update-Route53Record {
+    param (
+        [string]$HostedZoneName,
+        [string]$RecordName,
+        [string]$CaBundlePath
+    )
+
+    # Step 1: Install AWS Tools for PowerShell if not already installed
+    if (-not (Get-Module -ListAvailable -Name AWS.Tools.Route53)) {
+        Install-Module -Name AWS.Tools.Route53 -Force -Scope CurrentUser
+    }
+
+    # Step 2: Retrieve instance private IP address using IMDSv2
+    try {
+        $Token = Invoke-RestMethod -Uri http://169.254.169.254/latest/api/token -Method PUT -Headers @{ "X-aws-ec2-metadata-token-ttl-seconds" = "21600" }
+        $PrivateIpAddress = Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/local-ipv4 -Headers @{ "X-aws-ec2-metadata-token" = $Token }
+    } catch {
+        Write-Error "Unable to retrieve instance metadata. Ensure this script is running on an EC2 instance and IMDSv2 is enabled."
+        return
+    }
+
+    # Step 3: Retrieve the Hosted Zone ID using AWS Tools for PowerShell
+    try {
+        $HostedZone = Get-R53HostedZone | Where-Object { $_.Name -eq "$HostedZoneName." }
+        if (-not $HostedZone) {
+            Write-Error "Hosted zone '$HostedZoneName' not found."
+            return
+        }
+    } catch {
+        Write-Error "Unable to retrieve the hosted zone. Ensure you have the necessary permissions."
+        return
+    }
+
+    # Step 4: Create or Update Route 53 Record using AWS Tools for PowerShell
+    $ChangeBatch = @{
+        Comment = "Update record to reflect new IP address"
+        Changes = @(
+            @{
+                Action = "UPSERT"
+                ResourceRecordSet = @{
+                    Name = $RecordName
+                    Type = "A"
+                    TTL = 60
+                    ResourceRecords = @(@{ Value = $PrivateIpAddress })
+                }
+            }
+        )
+    }
+
+    try {
+        Edit-R53ResourceRecordSet -HostedZoneId $HostedZone.HostedZone.Id -ChangeBatch $ChangeBatch -CaBundlePath $CaBundlePath
+        Write-Output "Route 53 record created/updated successfully."
+    } catch {
+        Write-Error "Failed to create or update the Route 53 record."
+    }
+}
+
+# Example usage of the function
+$HostedZoneName = "dakshin.com"
+$RecordName = "example.dakshin.com"
+$CaBundlePath = "C:\temp\cacert.pem"  # Path to your custom CA bundle
+
+Update-Route53Record -HostedZoneName $HostedZoneName -RecordName $RecordName -CaBundlePath $CaBundlePath
