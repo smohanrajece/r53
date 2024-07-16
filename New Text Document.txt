@@ -1,0 +1,376 @@
+Record creation with replace the hostname and ip address
+***********************************************************
+
+variable replacement: https://www.sharepointdiary.com/2021/04/string-replacement-in-powershell.html
+
+instead of json we can use txt format: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-migrating.html
+******************************************
+
+
+Final Command:
+******************
+aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://change-records.txt
+
+
+Command to create r53record values:
+**************************************
+Set-Content -Path "r53records.txt" -Value $jsonContent
+
+sample raw r53 values:
+*************************
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "hello1.dakshin.com",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "4.9.6.7"}]
+}}]
+}
+
+__________________________________________________________________________________________________________________________________
+
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\Users\Administrator> aws --version
+aws-cli/2.17.11 Python/3.11.8 Windows/10 exec-env/EC2 exe/AMD64
+PS C:\Users\Administrator> pwd
+
+Path
+----
+C:\Users\Administrator
+
+
+PS C:\Users\Administrator> cd .\Desktop
+PS C:\Users\Administrator\Desktop> dir
+
+
+    Directory: C:\Users\Administrator\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        6/21/2016   3:36 PM            527 EC2 Feedback.website
+-a----        6/21/2016   3:36 PM            554 EC2 Microsoft Windows Guide.website
+
+
+PS C:\Users\Administrator\Desktop> HostedZoneId = "dakshin.com"
+HostedZoneId : The term 'HostedZoneId' is not recognized as the name of a cmdlet, function, script file, or operable
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ HostedZoneId = "dakshin.com"
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (HostedZoneId:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Administrator\Desktop>
+PS C:\Users\Administrator\Desktop> $HostedZoneId = "dakshin.com"
+PS C:\Users\Administrator\Desktop> echo $HostedZoneId
+dakshin.com
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+Error parsing parameter '--change-batch': Expected: '=', received: 'ï' for input:
+ï»¿{
+^
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "a.dakshin.com",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "4.4.4.5"}]
+}}]
+}
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-idZ04615132BB8D36F9QWS5 --change-batch file://sample.json
+
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+
+aws.exe: error: the following arguments are required: --hosted-zone-id
+
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id Z04615132BB8D36F9QWS5 --change-batch file://sample.json
+
+Error parsing parameter '--change-batch': Expected: '=', received: 'ï' for input:
+ï»¿{
+^
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "a.dakshin.com",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "4.4.4.5"}]
+}}]
+}
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id Z04615132BB8D36F9QWS5 --change-batch file://sample.json
+{
+    "ChangeInfo": {
+        "Id": "/change/C00044771SPJKSJ0NCG6B",
+        "Status": "PENDING",
+        "SubmittedAt": "2024-07-09T20:02:35.481000+00:00",
+        "Comment": "CREATE/DELETE/UPSERT a record "
+    }
+}
+
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+An error occurred (NoSuchHostedZone) when calling the ChangeResourceRecordSets operation: No hosted zone found with ID: dakshin.com
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+An error occurred (NoSuchHostedZone) when calling the ChangeResourceRecordSets operation: No hosted zone found with ID: dakshin.com
+PS C:\Users\Administrator\Desktop> $HostedZoneId =  "Z04615132BB8D36F9QWS5"
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+{
+    "ChangeInfo": {
+        "Id": "/change/C0152330PSN6VO2R01DS",
+        "Status": "PENDING",
+        "SubmittedAt": "2024-07-09T20:04:42.758000+00:00",
+        "Comment": "CREATE/DELETE/UPSERT a record "
+    }
+}
+
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+{
+    "ChangeInfo": {
+        "Id": "/change/C00354761CN2UXZ2KY1UX",
+        "Status": "PENDING",
+        "SubmittedAt": "2024-07-09T20:04:46.740000+00:00",
+        "Comment": "CREATE/DELETE/UPSERT a record "
+    }
+}
+
+PS C:\Users\Administrator\Desktop> $Name =  "a.dakshin.com"
+PS C:\Users\Administrator\Desktop> echo $Name
+a.dakshin.com
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+An error occurred (InvalidChangeBatch) when calling the ChangeResourceRecordSets operation: [RRSet with DNS name \044name. is not permitted in zone dakshin.com.]
+PS C:\Users\Administrator\Desktop> $R53Name =  "a.dakshin.com"
+PS C:\Users\Administrator\Desktop> echo $R53Name
+a.dakshin.com
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+An error occurred (InvalidChangeBatch) when calling the ChangeResourceRecordSets operation: [RRSet with DNS name \044name. is not permitted in zone dakshin.com.]
+PS C:\Users\Administrator\Desktop> $R53Name =  "hello.dakshin.com"
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+An error occurred (InvalidChangeBatch) when calling the ChangeResourceRecordSets operation: [RRSet with DNS name \044name. is not permitted in zone dakshin.com.]
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+Parameter validation failed:
+Unknown parameter in ChangeBatch.Changes[0].ResourceRecordSet: "HostedZoneName", must be one of: Name, Type, SetIdentifier, Weight, Region, GeoLocation, Failover, MultiValueAnswer, TTL, ResourceRecords, AliasTarget, HealthCheckId, TrafficPolicyInstanceId, CidrRoutingConfig, GeoProximityLocation
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+{
+    "ChangeInfo": {
+        "Id": "/change/C09952392SAO6LSV5H7PY",
+        "Status": "PENDING",
+        "SubmittedAt": "2024-07-09T20:17:39.273000+00:00",
+        "Comment": "CREATE/DELETE/UPSERT a record "
+    }
+}
+
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://change-records.txt
+{
+    "ChangeInfo": {
+        "Id": "/change/C0426347V7KHVK51B0X8",
+        "Status": "PENDING",
+        "SubmittedAt": "2024-07-09T20:25:25.900000+00:00",
+        "Comment": "CREATE/DELETE/UPSERT a record "
+    }
+}
+
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://change-records.txt^C
+PS C:\Users\Administrator\Desktop> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch '{
+>>     "Comment": "CREATE/DELETE/UPSERT a record",
+>>     "Changes": [
+>>         {
+>>             "Action": "UPSERT",
+>>             "ResourceRecordSet": {
+>>                 "Name": "test1.dakshin.com",
+>>                 "Type": "A",
+>>                 "TTL": 300,
+>>                 "ResourceRecords": [
+>>                     {
+>>                         "Value": "4.4.4.6"
+>>                     }
+>>                 ]
+>>             }
+>>         }
+>>     ]
+>> }'
+
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+
+Unknown options: record,
+    Changes: [
+        {
+            Action: UPSERT,
+            ResourceRecordSet: {
+                Name: test1.dakshin.com,
+                Type: A,
+                TTL: 300,
+                ResourceRecords: [
+                    {
+                        Value: 4.4.4.6
+                    }
+                ]
+            }
+        }
+    ]
+}, a
+
+PS C:\Users\Administrator\Desktop> ls env:
+
+Name                           Value
+----                           -----
+ALLUSERSPROFILE                C:\ProgramData
+APPDATA                        C:\Users\Administrator\AppData\Roaming
+AWS_EXECUTION_ENV              EC2
+CLIENTNAME                     DAKSHIN
+CommonProgramFiles             C:\Program Files\Common Files
+CommonProgramFiles(x86)        C:\Program Files (x86)\Common Files
+CommonProgramW6432             C:\Program Files\Common Files
+COMPUTERNAME                   EC2AMAZ-5RCQAMM
+ComSpec                        C:\Windows\system32\cmd.exe
+DriverData                     C:\Windows\System32\Drivers\DriverData
+EC2LAUNCH_TELEMETRY            1
+HOMEDRIVE                      C:
+HOMEPATH                       \Users\Administrator
+LOCALAPPDATA                   C:\Users\Administrator\AppData\Local
+LOGONSERVER                    \\EC2AMAZ-5RCQAMM
+NUMBER_OF_PROCESSORS           1
+OS                             Windows_NT
+Path                           C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\O...
+PATHEXT                        .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+PROCESSOR_ARCHITECTURE         AMD64
+PROCESSOR_IDENTIFIER           Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
+PROCESSOR_LEVEL                6
+PROCESSOR_REVISION             4f01
+ProgramData                    C:\ProgramData
+ProgramFiles                   C:\Program Files
+ProgramFiles(x86)              C:\Program Files (x86)
+ProgramW6432                   C:\Program Files
+PSModulePath                   C:\Users\Administrator\Documents\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules;C:\Program ...
+PUBLIC                         C:\Users\Public
+SESSIONNAME                    RDP-Tcp#1
+SystemDrive                    C:
+SystemRoot                     C:\Windows
+TEMP                           C:\Users\ADMINI~1\AppData\Local\Temp\2
+TMP                            C:\Users\ADMINI~1\AppData\Local\Temp\2
+USERDOMAIN                     EC2AMAZ-5RCQAMM
+USERDOMAIN_ROAMINGPROFILE      EC2AMAZ-5RCQAMM
+USERNAME                       Administrator
+USERPROFILE                    C:\Users\Administrator
+windir                         C:\Windows
+
+
+PS C:\Users\Administrator\Desktop> $R53Name =  "hello.dakshin.com"
+PS C:\Users\Administrator\Desktop> eco $R53Name
+eco : The term 'eco' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path
+was included, verify that the path is correct and try again.
+At line:1 char:1
++ eco $R53Name
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (eco:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\Administrator\Desktop> echo $R53Name
+hello.dakshin.com
+PS C:\Users\Administrator\Desktop> $content = Get-Content "change-records.txt"
+PS C:\Users\Administrator\Desktop> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "COTS",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "4.4.4.6"}]
+}}]
+}
+PS C:\Users\Administrator\Desktop> $content = Get-Content "test.txt"
+PS C:\Users\Administrator\Desktop> echo $content
+aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://change-records.txt
+
+
+#powershell replace string in file
+$content = Get-Content "C:\myfile.txt"
+$content | ForEach-Object {$_ -replace "Hello", "Hi"} | Set-Content "C:\myfile.txt"
+
+
+#Read more: https://www.sharepointdiary.com/2021/04/string-replacement-in-powershell.html#ixzz8fWDxMONt
+
+
+$content = Get-Content "change-records.txt"
+$content | ForEach-Object {$_ -replace "COTS", "$R53Name"} | Set-Content "myfile.txt"
+PS C:\Users\Administrator\Desktop> $content = Get-Content "change-records"
+Get-Content : Cannot find path 'C:\Users\Administrator\Desktop\change-records' because it does not exist.
+At line:1 char:12
++ $content = Get-Content "change-records"
++            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Admini...\change-records:String) [Get-Content], ItemNotFoundException
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+
+PS C:\Users\Administrator\Desktop> $content = Get-Content "change-records.txt"
+PS C:\Users\Administrator\Desktop> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "COTS",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "4.4.4.6"}]
+}}]
+}
+PS C:\Users\Administrator\Desktop> $content | ForEach-Object {$_ -replace "COTS", "$R53Name"} | Set-Content "change-records.txt"
+PS C:\Users\Administrator\Desktop> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "COTS",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "4.4.4.6"}]
+}}]
+}
+PS C:\Users\Administrator\Desktop> $content = Get-Content "change-records.txt"
+PS C:\Users\Administrator\Desktop> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "hello.dakshin.com",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "ipadd"}]
+}}]
+}
+PS C:\Users\Administrator\Desktop> $content | ForEach-Object {$_ -replace "COTS", "$R53Name"} | Set-Content "change-records.txt"^C
+PS C:\Users\Administrator\Desktop> $ipadd =  "4.5.6.7"
+PS C:\Users\Administrator\Desktop> echo $ipadd
+4.5.6.7
+PS C:\Users\Administrator\Desktop> $content | ForEach-Object {$_ -replace "COTS", "$ipadd"} | Set-Content "change-records.txt"
+PS C:\Users\Administrator\Desktop> $content | ForEach-Object {$_ -replace "ipadd", "$ipadd"} | Set-Content "change-records.txt"
+PS C:\Users\Administrator\Desktop> $content | ForEach-Object {$_ -replace "COTS", "$R53Name"} | Set-Content "change-records.txt"
