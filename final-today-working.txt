@@ -1,0 +1,98 @@
+aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://sample.json
+
+aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://change-records.txt
+
+
+#powershell replace string in file
+$content = Get-Content "C:\myfile.txt"
+$content | ForEach-Object {$_ -replace "Hello", "Hi"} | Set-Content "C:\myfile.txt"
+
+
+#Read more: https://www.sharepointdiary.com/2021/04/string-replacement-in-powershell.html#ixzz8fWDxMONt
+
+
+$content = Get-Content "change-records"
+$content | ForEach-Object {$_ -replace "COTS", "$R53Name"} | Set-Content "change-records.txt"
+
+
+
+************************************************************************
+
+Step 1:
+***********
+
+copy r53record file to Temp folder
+
+Step 2:
+************
+change the hostname:
+
+PS C:\Users\Administrator> cd\
+PS C:\> $COTS_HOSTNAME =  "test.dakshin.com"
+PS C:\> echo $COTS_HOSTNAME
+test.dakshin.com
+PS C:\> $content = Get-Content "C:\Temp\r53record.txt"
+PS C:\> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "R53HostName",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "IPAdd"}]
+}}]
+}
+PS C:\> $content | ForEach-Object {$_ -replace "R53HostName", "$COTS_HOSTNAME"} | Set-Content "C:\Temp\r53record.txt"
+PS C:\>
+
+Step 3:
+************
+change the ipaddress:
+
+PS C:\> $COTS_IPADDRESS =  "192.168.2.1"
+PS C:\> echo $COTS_IPADDRESS
+192.168.2.1
+PS C:\> $content = Get-Content "C:\Temp\r53record.txt"
+PS C:\> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "test.dakshin.com",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "IPAdd"}]
+}}]
+}
+PS C:\> $content | ForEach-Object {$_ -replace "IPAdd", "$COTS_IPADDRESS"} | Set-Content "C:\Temp\r53record.txt"
+PS C:\> echo $content
+{
+            "Comment": "CREATE/DELETE/UPSERT a record ",
+            "Changes": [{
+            "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                                    "Name": "test.dakshin.com",
+                                    "Type": "A",
+                                    "TTL": 300,
+                                 "ResourceRecords": [{ "Value": "IPAdd"}]
+}}]
+}
+PS C:\>
+
+Step 4:
+************
+PS C:\> $HostedZoneId =  "Z04615132BB8D36F9QWS5"
+PS C:\> aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch file://C:/Temp/r53record.txt
+{
+    "ChangeInfo": {
+        "Id": "/change/C062783521Y8Z27MZMLOQ",
+        "Status": "PENDING",
+        "SubmittedAt": "2024-07-09T21:30:13.537000+00:00",
+        "Comment": "CREATE/DELETE/UPSERT a record "
+    }
+}
+
+PS C:\>
